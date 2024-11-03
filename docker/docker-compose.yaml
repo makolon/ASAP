@@ -1,10 +1,21 @@
 x-default-asap-volumes: &default-asap-volumes
   - type: bind
+    source: /tmp/.X11-unix
+    target: /tmp/.X11-unix
+  - type: bind
+    source: /etc/localtime
+    target: /etc/localtime
+    read_only: true
+  - type: bind
     source: ../
     target: ${ASAP_PATH}
 
 x-default-asap-environment: &default-asap-environment
-  - DISPLAY=:0
+  - DISPLAY
+  - TERM
+  - QT_X11_NO_MITSHM=1
+  - XAUTHORITY=${__ISAACLAB_TMP_XAUTH}
+  - MESA_GL_VERSION_OVERRIDE
 
 x-default-asap-deploy: &default-asap-deploy
   resources:
@@ -15,6 +26,18 @@ x-default-asap-deploy: &default-asap-deploy
           capabilities: [ gpu ]
 
 services:
+  # This service is the vnc desktop image
+  desktop:
+    image: ghcr.io/matsuolab/virtual_desktop:latest
+    runtime: nvidia
+    environment: *default-asap-environment
+    ports:
+      - "${WEB_PORT}:6080"
+    volumes:
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+    security_opt:
+      - seccomp:unconfined
+    deploy: *default-asap-deploy
   # This service is the ASAP image
   asap:
     profiles: [ "asap" ]
@@ -26,7 +49,8 @@ services:
         - ASAP_PATH_ARG=${ASAP_PATH}
         - DOCKER_USER_HOME_ARG=${DOCKER_USER_HOME}
     image: asap:${ASAP_VERSION}
-    container_name: asap_docker
+    depends_on:
+      - desktop
     environment: *default-asap-environment
     volumes: *default-asap-volumes
     network_mode: host
