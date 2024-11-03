@@ -1,0 +1,37 @@
+x-default-asap-volumes: &default-asap-volumes
+  - type: bind
+    source: ../
+    target: ${ASAP_PATH}
+
+x-default-asap-environment: &default-asap-environment
+  - DISPLAY=:0
+
+x-default-asap-deploy: &default-asap-deploy
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [ gpu ]
+
+services:
+  # This service is the ASAP image
+  asap:
+    profiles: [ "asap" ]
+    env_file: .env
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        - ASAP_PATH_ARG=${ASAP_PATH}
+        - DOCKER_USER_HOME_ARG=${DOCKER_USER_HOME}
+    image: asap:${ASAP_VERSION}
+    container_name: asap_docker
+    environment: *default-asap-environment
+    volumes: *default-asap-volumes
+    network_mode: host
+    deploy: *default-asap-deploy
+    # This is the entrypoint for the container
+    entrypoint: bash
+    stdin_open: true
+    tty: true
