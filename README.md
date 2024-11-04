@@ -24,7 +24,7 @@ This repository contains the official code and dataset of [ASAP: Automated Seque
 ### 1. Clone repository
 
 ```
-git clone git@github.com:yunshengtian/RobotAssembly.git
+git clone https@github.com/makolon/ASAP.git
 ```
 
 ### 2. Python environment
@@ -32,14 +32,12 @@ git clone git@github.com:yunshengtian/RobotAssembly.git
 #### Step 1:
 
 ```
-conda env create -f environment.yml
-conda activate asap
+docker compose build asap
+docker compose run asap
 ```
-
-or
-
+Then, synchronize the uv environment.
 ```
-pip install numpy networkx matplotlib scipy pyglet rtree sortedcontainers scipy tqdm trimesh torch torch_geometric seaborn ikpy pyquaternion
+uv sync
 ```
 
 #### Step 2:
@@ -47,26 +45,26 @@ pip install numpy networkx matplotlib scipy pyglet rtree sortedcontainers scipy 
 Due to dependency issues, the libraries below must be installed after the above step is complete.
 
 ```
-pip install torch_sparse torch_scatter
+uv pip install torch_sparse torch_scatter
 ```
 
 ### 3. Python binding of simulation
 
 ```
 cd simulation
-python setup.py install
+uv run python setup.py install
 ```
 
 To test if the installation steps are successful, run:
 
 ```
-python test_sim/test_simple_sim.py --model box/box_stack --steps 2000
+uv run python test_sim/test_simple_sim.py --model box/box_stack --steps 2000
 ```
 
 We also provide a beam assembly under ``assets/beam_assembly`` folder. To visualize the simulation of that, run:
 
 ```
-python test_sim/test_multi_sim.py --dir beam_assembly --id original --gravity 9.8 --steps 2000 --friction 0.5 --camera-pos 3.15 -1.24  1.6 --camera-lookat 2.59 -0.55 1.16
+uv run python test_sim/test_multi_sim.py --dir beam_assembly --id original --gravity 9.8 --steps 2000 --friction 0.5 --camera-pos 3.15 -1.24  1.6 --camera-lookat 2.59 -0.55 1.16
 ```
 
 ### 4. Assembly dataset (optional)
@@ -81,8 +79,9 @@ Install the training set and test set:
 For point-based SDF collision check to work more accurately, we highly recommend subdividing the assembly meshes to have denser contact points by running ``assets/subdivide_batch.py``. For example, to subdivide the dataset saved in ``assets/test_assembly`` and export to ``assets/test_assembly_dense``:
 
 ```
-python assets/subdivide_batch.py --source-dir assets/test_assembly --target-dir assets/test_assembly_dense --num-proc NUM_PROCESSES
+uv run python assets/subdivide_batch.py --source-dir assets/test_assembly --target-dir assets/test_assembly_dense --max-edge 0.1 --num-proc 64
 ```
+Running this will take several hours, so please set `NUM_PROCESSES` to 64 or so to speed it up. 
 
 ## Experiments
 
@@ -91,7 +90,7 @@ python assets/subdivide_batch.py --source-dir assets/test_assembly --target-dir 
 Use the following command to run sequence planning on the beam assembly we provided:
 
 ```
-python plan_sequence/run_seq_plan.py --dir beam_assembly --id original --planner dfs --generator heur-out --max-gripper 2 --base-part 6 --log-dir logs/beam_seq --early-term
+uv run python plan_sequence/run_seq_plan.py --dir beam_assembly --id original --planner dfs --generator heur-out --max-gripper 2 --base-part 6 --log-dir logs/beam_seq --early-term
 ```
 
 Important arguments include (see the complete list in `plan_sequence/run_seq_plan.py`):
@@ -126,7 +125,7 @@ There are three files generated:
 We separate the planning and result generation for flexibility considerations. Suppose you have run the above command for planning, then use the following command to generate planned results:
 
 ```
-python plan_sequence/play_logged_plan.py --log-dir logs/beam_seq/dfs-heur-out/s0/original/ --assembly-dir assets/beam_assembly/original --result-dir results/beam_seq/ --save-all --camera-pos 3.15 -1.24  1.6 --camera-lookat 2.59 -0.55 1.16
+uv run python plan_sequence/play_logged_plan.py --log-dir logs/beam_seq/dfs-heur-out/s0/original/ --assembly-dir assets/beam_assembly/original --result-dir results/beam_seq/ --save-all --camera-pos 3.15 -1.24  1.6 --camera-lookat 2.59 -0.55 1.16
 ```
 
 Important arguments include (see the complete list in `plan_sequence/play_logged_plan.py`):
@@ -186,7 +185,7 @@ Use `plan_sequence/run_seq_plan_batch.py` to run batch sequence planning for all
 
 To check success rates quantitatively, run:
 ```
-python plan_sequence/check_success_rate_batch.py --log-dir {log-dir}/g{max-gripper}
+uv run python plan_sequence/check_success_rate_batch.py --log-dir {log-dir}/g{max-gripper}
 ```
 
 ## Simulation Viewer
@@ -207,7 +206,7 @@ To run the algorithm on your custom assembly meshes, some pre-processing on the 
 We provide a pre-processing script `assets/process_mesh.py` that rescales the custom meshes to provide an unified input to the algorithm. Assume you have a set of .obj meshes placed under `source_dir/` that form an assembly and are all in the assembled states. Run:
 
 ```
-python assets/process_mesh.py --source-dir source_dir/ --target-dir target_dir/ --subdivide
+uv run python assets/process_mesh.py --source-dir source_dir/ --target-dir target_dir/ --subdivide
 ```
 
 Then, all the pre-processed meshes will be written to the output directory `target_dir/`. 
