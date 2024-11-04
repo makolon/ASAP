@@ -30,8 +30,10 @@ def seq_plan(asset_folder, assembly_dir, generator_name, planner_name, num_proc,
             'budget': budget, 'max_grippers': max_gripper, 'max_poses': max_pose, 'pose_reuse': pose_reuse, 'early_term': early_term, 'timeout': timeout,
             'plan_grasp': plan_grasp, 'plan_arm': plan_arm, 'gripper_type': gripper_type, 'gripper_scale': gripper_scale, 'optimizer': optimizer,
         }
+        print("[INFO]: Start planning!")
         tree = planner.plan(**setup, debug=debug - 1, render=False)
 
+        print("[INFO]: Get status!")
         stats = planner.get_stats(tree)
 
         if log_dir is not None:
@@ -104,5 +106,6 @@ if __name__ == '__main__':
     else:
         log_dir = os.path.join(args.log_dir, exp_name, f's{args.seed}', f'{args.id}')
 
+    print("[INFO]: Execute sequential planning!")
     seq_plan(asset_folder, assembly_dir, args.generator, args.planner, args.num_proc, args.seed, args.budget, args.max_gripper, args.max_pose, args.pose_reuse, args.early_term, args.timeout, args.base_part,
         not args.disable_save_sdf, args.clear_sdf, args.plan_grasp, args.plan_arm, args.gripper, args.scale, args.optimizer, args.debug, args.render, record_dir, log_dir)

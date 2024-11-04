@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.8.0-base-ubuntu20.04
+FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -6,6 +6,13 @@ ARG ASAP_PATH_ARG
 ARG DOCKER_USER_HOME_ARG
 ENV ASAP_PATH=${ASAP_PATH_ARG}
 ENV DOCKER_USER_HOME=${DOCKER_USER_HOME_ARG}
+
+# Copy cuda11.8 from cuda_stage image
+ENV PATH=/usr/local/cuda-11.8/bin:$PATH
+ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
+ENV USE_CX11_ABI=0
+ENV PRE_CX11_ABI=ON
+ENV CUDA_HOME='/usr/local/cuda-11.8/'
 
 # Set up user
 WORKDIR ${ASAP_PATH}
