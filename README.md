@@ -24,7 +24,7 @@ This repository contains the official code and dataset of [ASAP: Automated Seque
 ### 1. Clone repository
 
 ```
-git clone https@github.com/makolon/ASAP.git
+git clone https://github.com/makolon/ASAP.git
 ```
 
 ### 2. Python environment
