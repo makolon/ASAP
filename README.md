@@ -47,6 +47,11 @@ Due to dependency issues, the libraries below must be installed after the above 
 ```
 uv pip install torch_sparse torch_scatter
 ```
+or run following.
+```
+uv pip install --no-build-isolation --no-index torch-scatter -f https://pytorch-geometric.com/whl/torch-1.13.1+cu117.html
+uv pip install --no-build-isolation --no-index torch-sparse -f https://pytorch-geometric.com/whl/torch-1.13.1+cu117.html
+```
 
 ### 3. Python binding of simulation
 
