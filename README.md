@@ -45,7 +45,7 @@ uv sync
 Due to dependency issues, the libraries below must be installed after the above step is complete.
 
 ```
-uv pip install torch_sparse torch_scatter
+uv pip install torch-scatter torch-sparse torch-geometric --force-reinstall --no-build-isolation
 ```
 or run following.
 ```
